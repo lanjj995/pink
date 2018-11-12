@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.baizhi.dao.EmpDao">
+    <sql id="empAll">
+        id,name,salary,age,bir
+    </sql>
+    <resultMap id="querlEmp" type="Emp">
+        <id property="id" column="eid"/>
+        <result property="name" column="ename"/>
+        <result property="salary" column="salary"/>
+        <result property="age" column="age"/>
+        <result property="bir" column="bir"/>
+        <association property="dept" javaType="Dept">
+            <id property="id" column="did"/>
+            <result property="name" column="dname"/>
+        </association>
+    </resultMap>
+    <select id="querlAll" resultType="int">
+        select count(*)
+        from t_emp e inner join t_dept d
+            on e.dept_id = d.id
+    </select>
+
+    <delete id="delete" parameterType="java.lang.String">
+        delete from t_emp where id = #{id}
+    </delete>
+
+    <update id="update" parameterType="Emp">
+        update t_emp set name = #{name},salary = #{salary},age = #{age},bir = #{bir},dept_id=#{dept.id} where id = #{id}
+    </update>
+
+    <insert id="save" parameterType="Emp">
+        insert into t_emp values(#{id},#{name},#{salary},#{age},#{bir},#{dept.id})
+    </insert>
+    <delete id="deleteByDeptId" parameterType="int">
+        delete from t_emp where dept_id = #{id}
+    </delete>
+
+    <select id="queryByPage" resultMap="querlEmp">
+        select e.id eid,e.name ename,salary,age,bir,d.id did,d.name dname
+        from t_emp e inner join t_dept d
+        on e.dept_id = d.id
+        order by e.dept_id
+        limit ${page.start},${page.pageSize}
+    </select>
+</mapper>
